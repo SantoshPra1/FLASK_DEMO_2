@@ -1,8 +1,46 @@
 {% extends 'layout/base.html' %}
 
 {% block body %}
-
+<!-- shortcut to generate a vaible location => .container>.row>.col-md-4 -->
+<div class="container">
+    <div class="row form-row">
+        <div class="col-lg-4 ">
+            <h1 class="my-4 display-4 text-center">Sign In</h1>
+            <form class="shadow-lg p-3 rounded bg-light">
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email address</label>
+                    <input type="email" class="form-control" id="email" name="email" placeholder="ex: Ravi@gmail.com">
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" class="form-control" id="password" name="password"
+                        placeholder="Your Password">
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+        </div>
+    </div>
+</div>
 
 {% endblock %}
 
+{% block css %}
+<style>
+    .form-row {
+        display: flex;
+        height: 90vh;
+        justify-content: center;
+        align-items: center;
+    }
+
+    h1 {
+        color: rgb(69, 255, 174);
+    }
+
+    main {
+        background-color: #efefef;
+        background-image: url('https://images.unsplash.com/photo-1663849022269-9ba5b31a2941?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwxMDJ8fHxlbnwwfHx8fA%3D%3D&auto=format&fit=crop&w=600&q=60');
+    }
+</style>
+{% endblock %}
 
