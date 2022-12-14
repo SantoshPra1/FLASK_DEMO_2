@@ -3,10 +3,30 @@
 {% block body %}
 
 <form method="post">
-    <button>Start Parking Detection System</button>
+    <button> Parking Detection System</button>
+    <button>Create</button>
 </form>
 
 {% endblock %}
-
+{% block css %}
+<style>
+  main {
+    display: flex;
+    width: 100vw;
+    height: 90vh;
+    background-color: rgb(99, 55, 137);
+    background-image: url('https://plus.unsplash.com/premium_photo-1661902297268-10b52852e862?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=871&q=80');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: bottom;
+    flex-flow: column;
+    justify-content: center;
+    align-items: center;
+    color: rgba(58, 237, 58, 0.97);
+    font-size: 2rem;
+    gap: 1rem;
+  }
+  </style>
+{% endblock %}
 
 

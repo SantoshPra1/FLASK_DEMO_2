@@ -69,7 +69,7 @@ def login():
                     if user.password == password:
                         create_login_session(user)
                         flash('Login Successfull', "success")
-                        return redirect('/')
+                        return redirect('/detect')
                     else:
                         errors['password'] = 'Password is invalid'
                 else:
@@ -119,6 +119,10 @@ def parking_detection():
     if request.method == 'POST':    
         pkd.detector()
     return render_template('parking_system.html')
+
+@app.route('/form.html')
+def method_name():
+    pass
 
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=8000, debug=True) 
