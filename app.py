@@ -120,9 +120,11 @@ def parking_detection():
         pkd.detector()
     return render_template('parking_system.html')
 
-@app.route('/form.html')
-def method_name():
-    pass
+@app.route('/form')
+def form():
+    return render_template('form.html')
+    
+    
 
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=8000, debug=True) 
