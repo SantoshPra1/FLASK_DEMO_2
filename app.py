@@ -1,7 +1,9 @@
-from flask import Flask, render_template, request, redirect, flash, session
+from flask import Flask, render_template, request, redirect, flash, session, url_for
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 import parking_detector as pkd
+from werkzeug.utils import secure_filename
+import os
 
 db = SQLAlchemy()
 
@@ -25,11 +27,24 @@ class User(db.Model):
     def __str__(self):
         return f'{self.username}({self.id})'
 
+class ParkingLocation(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(), unique=True, nullable=False)
+    address = db.Column(db.String())
+    image_path = db.Column(db.String())
+    width = db.Column(db.Integer)
+    height = db.Column(db.Integer)
+    created_on = db.Column(db.DateTime, default=datetime.now)
+
+    def __str__(self):
+        return f'{self.id}_{self.name}'
+
 def create_app():
     app = Flask(__name__)
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database/app.sqlite'
     app.config['SQLALCHEMY_ECHO'] = True
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config['UPLOAD_FOLDER'] = 'uploads'
     app.secret_key = 'supersecretkeythatnooneknows'
     db.init_app(app)
     return app
@@ -116,12 +131,38 @@ def logout():
 
 @app.route('/detect', methods=['GET','POST'])
 def parking_detection():
-    if request.method == 'POST':    
-        pkd.detector()
     return render_template('parking_system.html')
 
-@app.route('/form')
+@app.route('/detect/start')
+def start_detection():
+    return render_template('expression')
+
+@app.route('/form', methods=['GET','POST'])
 def form():
+    if request.method=='POST':
+        if 'file' not in request.files:
+            flash('No file part','danger')
+            return redirect(request.url)
+        name = request.form.get('name')
+        addr = request.form.get('address')
+        w = request.form.get('width')
+        h = request.form.get('height')
+        file = request.files['file']
+        if file.filename == '':
+            flash('No selected file')
+            return redirect(request.url)
+        if file and name and addr and w and h:
+            filename = secure_filename(file.filename)
+            path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            file.save(path)
+            parking = ParkingLocation(name=name, address=addr,image_path=path, width=int(w), height=int(h))
+            db.session.add(parking)
+            db.session.commit()
+            flash("Parking information saved successfully")
+            return redirect('/')
+        else:
+            flash("Some error occurred.")
+
     return render_template('form.html')
     
     
