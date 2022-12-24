@@ -44,7 +44,7 @@ def create_app():
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database/app.sqlite'
     app.config['SQLALCHEMY_ECHO'] = True
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    app.config['UPLOAD_FOLDER'] = 'uploads'
+    app.config['UPLOAD_FOLDER'] = 'static/uploads'
     app.secret_key = 'supersecretkeythatnooneknows'
     db.init_app(app)
     return app
@@ -131,10 +131,21 @@ def logout():
 
 @app.route('/detect', methods=['GET','POST'])
 def parking_detection():
-    return render_template('parking_system.html')
+    data = db.session.query(ParkingLocation).all()
+    return render_template('parking_system.html', locs=data)
+
 
 @app.route('/detect/start')
 def start_detection():
+    return render_template('expression')
+
+@app.route('/detect/camera/<int:pid>')
+def start_detection(pid):
+    try:
+        row = db.session.query(ParkingLocation).get(pid)
+        # 
+    except:
+        pass
     return render_template('expression')
 
 @app.route('/form', methods=['GET','POST'])
@@ -152,14 +163,17 @@ def form():
             flash('No selected file')
             return redirect(request.url)
         if file and name and addr and w and h:
-            filename = secure_filename(file.filename)
-            path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            file.save(path)
-            parking = ParkingLocation(name=name, address=addr,image_path=path, width=int(w), height=int(h))
-            db.session.add(parking)
-            db.session.commit()
-            flash("Parking information saved successfully")
-            return redirect('/')
+            try:
+                filename = secure_filename(file.filename)
+                path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                file.save(path)
+                parking = ParkingLocation(name=name, address=addr,image_path=path, width=int(w), height=int(h))
+                db.session.add(parking)
+                db.session.commit()
+                flash("Parking information saved successfully")
+                return redirect('/')
+            except:
+                flash("some error occurred")
         else:
             flash("Some error occurred.")
 
@@ -167,8 +181,19 @@ def form():
     
 @app.route('/dashboard', methods=['GET','POST'])
 def dashboard():
-    if request.method=='POST':
-        return render_template('dashboard.html')  
+    data = db.session.query(ParkingLocation).all()
+    return render_template('dashboard.html', locs=data)  
 
+@app.route('/parking/delete/<int:pid>')
+def delete_parking(pid):
+    try:
+        row = db.session.query(ParkingLocation).get(pid)
+        if row:
+            db.session.delete(row)
+            db.session.commit()
+            flash("record deleted")
+    except:
+        flash("Could not delete entry")
+    return redirect('/dashboard')
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=8000, debug=True) 
