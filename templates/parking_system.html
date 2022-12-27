@@ -30,7 +30,8 @@
               <td>{{row.height}}</td>
               <td>{{row.created_on.date()}}</td>
               <td>
-                <a type="Parking" class="btn btn-lg btn-outline-dark" href="/detect/camera/{{row.id}}">🎥 Open Camera </a>
+                <a type="Parking" class="btn btn-sm btn-outline-dark" href="/detect/camera/{{row.id}}">🎥 Open Camera </a>
+                <a type="Parking" class="btn btn-sm btn-outline-dark" href="/edit/parking/{{row.id}}">📝 Edit Parking </a>
               </td>
             </tr>
             {% endfor %}

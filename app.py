@@ -4,6 +4,7 @@ from datetime import datetime
 import parking_detector as pkd
 from werkzeug.utils import secure_filename
 import os
+import parking_editor as pked
 
 db = SQLAlchemy()
 
@@ -34,6 +35,8 @@ class ParkingLocation(db.Model):
     image_path = db.Column(db.String())
     width = db.Column(db.Integer)
     height = db.Column(db.Integer)
+    posfile = db.Column(db.String, default="")
+    source = db.Column(db.String, default="")
     created_on = db.Column(db.DateTime, default=datetime.now)
 
     def __str__(self):
@@ -42,7 +45,7 @@ class ParkingLocation(db.Model):
 def create_app():
     app = Flask(__name__)
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database/app.sqlite'
-    app.config['SQLALCHEMY_ECHO'] = True
+    app.config['SQLALCHEMY_ECHO'] = False
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['UPLOAD_FOLDER'] = 'static/uploads'
     app.secret_key = 'supersecretkeythatnooneknows'
@@ -134,19 +137,32 @@ def parking_detection():
     data = db.session.query(ParkingLocation).all()
     return render_template('parking_system.html', locs=data)
 
-
-@app.route('/detect/start')
-def start_detection():
-    return render_template('expression')
-
 @app.route('/detect/camera/<int:pid>')
-def start_detection(pid):
+def open_parking_window(pid):
     try:
         row = db.session.query(ParkingLocation).get(pid)
-        # 
-    except:
-        pass
-    return render_template('expression')
+        print(f'{row.id}, {row.name}')
+        pkd.detector(posfile='project/hazratganj_1')
+    except Exception as e:
+        print('error',e)
+        flash(f"{e}", 'danger')
+
+    return redirect('/detect')
+
+@app.route('/edit/parking/<int:id>')
+def parking_space_picker(id):
+    try:
+        row = db.session.query(ParkingLocation).get(id)
+        parking_img = row.image_path
+        parking=row.name
+        w = row.width
+        h = row.height
+        pked.open_parking_image_window(parking_img, params=dict(parking=parking,w=w, h=h ))
+    except Exception as e:
+        print(e)
+        flash(f'{e}', 'danger')
+    return redirect('/detect')
+
 
 @app.route('/form', methods=['GET','POST'])
 def form():
