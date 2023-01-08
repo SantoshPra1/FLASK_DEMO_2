@@ -18,7 +18,18 @@ def mouseClick(events, x, y, flags, params):
     with open(params.get('parking'), 'wb') as f:
         pickle.dump(posList, f)
  
- 
+def mouseClick(events, x, y, flags, params):
+    global counter
+    if events == cv2.EVENT_LBUTTONDOWN:
+        
+        circles[counter]= x,y
+        counter =counter +1
+        print('circles')
+img = cv2.imread('static\uploads\WhatsApp_Image_2023-01-07_at_14.16.10.jpg')    
+cv2.imshow("Original Image",img)   
+cv2.setMouseCallback("Original Image", 'mousePoints')
+cv2.waitKey(0)
+
 def open_parking_image_window(pngimage='carParkImg.png',params={'parking':'hazratganj_1','w':107,'h':48}):
     try:
         with open(params.get('parking'), 'rb') as f:
@@ -30,7 +41,8 @@ def open_parking_image_window(pngimage='carParkImg.png',params={'parking':'hazra
         img = cv2.imread(pngimage)
         for pos in posList:
             cv2.rectangle(img, pos, (pos[0] + params.get('w'), pos[1] + params.get('h')), (255, 0, 255), 2)
-    
+
+   
         cv2.imshow("Image", img)
         params['poslist'] = posList
         cv2.setMouseCallback("Image", mouseClick, params)
